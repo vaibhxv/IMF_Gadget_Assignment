@@ -1,0 +1,350 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "IMF Gadget Management API",
+    "description": "API for managing IMF gadgets and equipment",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "Bearer token authorization"
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "description": "Register a new IMF agent",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "agent@imf.gov"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "secret123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registration successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "description": "Login to get access token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "agent@imf.gov"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "secret123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/gadgets": {
+      "get": {
+        "security": [{ "bearerAuth": [] }],
+        "description": "Get all gadgets",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": ["Available", "Deployed", "Destroyed", "Decommissioned"],
+            "description": "Filter gadgets by status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of gadgets",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "codename": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["Available", "Deployed", "Destroyed", "Decommissioned"]
+                  },
+                  "missionSuccessProbability": {
+                    "type": "number",
+                    "minimum": 60,
+                    "maximum": 100
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "security": [{ "bearerAuth": [] }],
+        "description": "Add a new gadget",
+        "parameters": [
+         
+        ],
+        "responses": {
+          "201": {
+            "description": "Gadget created successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "codename": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "example":"Available"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/gadgets/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "format": "uuid"
+        }
+      ],
+      "patch": {
+        "security": [{ "bearerAuth": [] }],
+        "description": "Update a gadget",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                
+                "status": {
+                  "type": "string",
+                  "enum": ["Deployed", "Available", "Destroyed", "Decommissioned"]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gadget updated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "codename": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "example":"Deployed"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Gadget not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [{ "bearerAuth": [] }],
+        "description": "Decommission a gadget",
+        "responses": {
+          "200": {
+            "description": "Gadget decommissioned successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "codename": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "example":"Decommissioned"
+                },
+                "decommissioned_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Gadget not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/gadgets/{id}/self-destruct": {
+      "post": {
+        "security": [{ "bearerAuth": [] }],
+        "description": "Trigger self-destruct sequence for a gadget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "confirmationCode": {
+                  "type": "string",
+                  "example": "ABC123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gadget destroyed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "codename": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "example":"Destroyed"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid confirmation code"
+          },
+          "404": {
+            "description": "Gadget not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  }
+}
