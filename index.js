@@ -33,6 +33,7 @@ app.use(
       '/auth/login',
       '/auth/register',
       '/api-docs/',
+      '/api-docs',
       '/api-docs/#/',
       '/api-docs/swagger-ui.css',
       '/api-docs/swagger-ui-bundle.js',
